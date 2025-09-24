@@ -21,7 +21,7 @@ const Navigation = ({ currentPage, onNavigate, totalResponses = 0 }) => {
             {/* 為愛前行基金會 LOGO */}
             <div className="flex items-center gap-2">
               <img 
-                src="/afl-logo.png" 
+                src="/spiritual-health-assessment/afl-logo.png" 
                 alt="財團法人新北市為愛前行基金會" 
                 className="h-10 w-auto object-contain"
                 onError={(e) => {
@@ -34,7 +34,7 @@ const Navigation = ({ currentPage, onNavigate, totalResponses = 0 }) => {
             {/* 台大生命教育中心 LOGO */}
             <div className="flex items-center gap-2">
               <img 
-                src="/ntu-logo.png" 
+                src="/spiritual-health-assessment/ntu-logo.png" 
                 alt="國立台灣大學生命教育研發育成中心" 
                 className="h-10 w-auto object-contain"
                 onError={(e) => {
