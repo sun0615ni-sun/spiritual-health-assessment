@@ -54,6 +54,20 @@ export const calculateOverallScore = (answers, isReligious) => {
   };
 };
 
+// 主要的計算分數函數 - 這是Report.jsx需要的函數
+export const calculateScores = (answers, isReligious = false) => {
+  const domainScores = calculateDomainScores(answers, isReligious);
+  const aspectScores = calculateAspectScores(answers, isReligious);
+  const overallScore = calculateOverallScore(answers, isReligious);
+  
+  return {
+    domains: domainScores,
+    aspects: aspectScores,
+    overall: overallScore,
+    isReligious
+  };
+};
+
 // 獲取分數等級和顏色
 export const getScoreLevel = (percentage) => {
   if (percentage >= 80) {
