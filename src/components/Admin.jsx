@@ -1,440 +1,465 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.jsx';
-import { Button } from '@/components/ui/button.jsx';
-import { Input } from '@/components/ui/input.jsx';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table.jsx';
-import { Badge } from '@/components/ui/badge.jsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx';
+import React, { useState, useEffect } from 'react'
+import { Button } from './ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
+import { Badge } from './ui/badge'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
 import { 
-  Download, Search, Filter, Users, BarChart3, 
-  Calendar, Eye, Trash2, Settings
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { format } from 'date-fns';
-import { zhTW } from 'date-fns/locale';
+  ArrowLeft, 
+  Download, 
+  Trash2, 
+  Search, 
+  Filter, 
+  BarChart3, 
+  Users, 
+  Calendar,
+  Eye,
+  FileText,
+  TrendingUp,
+  AlertCircle
+} from 'lucide-react'
 
-const Admin = () => {
-  const [responses, setResponses] = useState([]);
-  const [filteredResponses, setFilteredResponses] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterGender, setFilterGender] = useState('all');
-  const [filterReligion, setFilterReligion] = useState('all');
-  const [sortBy, setSortBy] = useState('date');
-  const [sortOrder, setSortOrder] = useState('desc');
+const Admin = ({ onBack }) => {
+  const [responses, setResponses] = useState([])
+  const [filteredResponses, setFilteredResponses] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterGender, setFilterGender] = useState('all')
+  const [filterAge, setFilterAge] = useState('all')
+  const [selectedResponse, setSelectedResponse] = useState(null)
+  const [showDetails, setShowDetails] = useState(false)
 
-  // 模擬資料 - 實際應用中會從後端API獲取
+  // 模擬數據載入
   useEffect(() => {
     const mockData = [
       {
         id: 1,
-        name: '張小明',
-        gender: 'male',
-        age: 28,
-        religion: '基督教',
-        testDate: new Date('2024-01-15'),
-        overallScore: 4.2,
-        isReligious: true,
-        answers: { q1_r: 4, q2_r: 5, q3_r: 3, q4_r: 4, q5_r: 5, q6_r: 4, q7_r: 5 }
+        timestamp: '2024-01-15 14:30:00',
+        profile: {
+          name: '張小明',
+          age: 25,
+          biologicalGender: 'male',
+          email: 'zhang@example.com',
+          nationality: 'ROC',
+          city: '台北市',
+          occupation: '工程師'
+        },
+        scores: {
+          overallScore: 4.2,
+          domainScores: {
+            '與自己的關係': 4.5,
+            '與他人的關係': 4.0,
+            '與自然的關係': 3.8,
+            '與超越者的關係': 4.5
+          }
+        },
+        isReligious: true
       },
       {
         id: 2,
-        name: '李美華',
-        gender: 'female',
-        age: 35,
-        religion: '無宗教信仰',
-        testDate: new Date('2024-01-14'),
-        overallScore: 3.8,
-        isReligious: false,
-        answers: { q1: 4, q2: 3, q3: 4, q4: 4, q5: 4, q6: 3, q7: 4 }
-      },
-      {
-        id: 3,
-        name: '王大偉',
-        gender: 'male',
-        age: 42,
-        religion: '佛教',
-        testDate: new Date('2024-01-13'),
-        overallScore: 4.5,
-        isReligious: true,
-        answers: { q1_r: 5, q2_r: 4, q3_r: 5, q4_r: 4, q5_r: 5, q6_r: 4, q7_r: 4 }
-      },
-      {
-        id: 4,
-        name: '陳雅婷',
-        gender: 'female',
-        age: 26,
-        religion: '天主教',
-        testDate: new Date('2024-01-12'),
-        overallScore: 3.9,
-        isReligious: true,
-        answers: { q1_r: 4, q2_r: 4, q3_r: 3, q4_r: 4, q5_r: 4, q6_r: 4, q7_r: 4 }
-      },
-      {
-        id: 5,
-        name: '林志強',
-        gender: 'male',
-        age: 31,
-        religion: '無宗教信仰',
-        testDate: new Date('2024-01-11'),
-        overallScore: 3.6,
-        isReligious: false,
-        answers: { q1: 3, q2: 4, q3: 3, q4: 4, q5: 3, q6: 4, q7: 4 }
+        timestamp: '2024-01-16 09:15:00',
+        profile: {
+          name: '李小華',
+          age: 32,
+          biologicalGender: 'female',
+          email: 'li@example.com',
+          nationality: 'ROC',
+          city: '新北市',
+          occupation: '教師'
+        },
+        scores: {
+          overallScore: 3.8,
+          domainScores: {
+            '與自己的關係': 3.5,
+            '與他人的關係': 4.2,
+            '與自然的關係': 3.6,
+            '與超越者的關係': 3.8
+          }
+        },
+        isReligious: false
       }
-    ];
-    setResponses(mockData);
-    setFilteredResponses(mockData);
-  }, []);
+    ]
+    
+    setResponses(mockData)
+    setFilteredResponses(mockData)
+  }, [])
 
   // 搜尋和篩選
   useEffect(() => {
     let filtered = responses.filter(response => {
-      const matchesSearch = response.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesGender = filterGender === 'all' || response.gender === filterGender;
-      const matchesReligion = filterReligion === 'all' || response.religion === filterReligion;
+      const matchesSearch = response.profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           response.profile.email.toLowerCase().includes(searchTerm.toLowerCase())
       
-      return matchesSearch && matchesGender && matchesReligion;
-    });
-
-    // 排序
-    filtered.sort((a, b) => {
-      let aValue, bValue;
+      const matchesGender = filterGender === 'all' || response.profile.biologicalGender === filterGender
       
-      switch (sortBy) {
-        case 'name':
-          aValue = a.name;
-          bValue = b.name;
-          break;
-        case 'score':
-          aValue = a.overallScore;
-          bValue = b.overallScore;
-          break;
-        case 'age':
-          aValue = a.age;
-          bValue = b.age;
-          break;
-        case 'date':
-        default:
-          aValue = a.testDate;
-          bValue = b.testDate;
-          break;
-      }
+      const matchesAge = filterAge === 'all' || 
+                        (filterAge === 'young' && response.profile.age < 30) ||
+                        (filterAge === 'middle' && response.profile.age >= 30 && response.profile.age < 50) ||
+                        (filterAge === 'senior' && response.profile.age >= 50)
+      
+      return matchesSearch && matchesGender && matchesAge
+    })
+    
+    setFilteredResponses(filtered)
+  }, [responses, searchTerm, filterGender, filterAge])
 
-      if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
-    });
-
-    setFilteredResponses(filtered);
-  }, [responses, searchTerm, filterGender, filterReligion, sortBy, sortOrder]);
-
-  const handleExportCSV = () => {
-    const headers = [
-      'ID', '姓名', '性別', '年齡', '宗教信仰', '檢測日期', '整體分數', '是否宗教信仰者',
-      'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7'
-    ];
-
-    const csvData = filteredResponses.map(response => [
-      response.id,
-      response.name,
-      response.gender === 'male' ? '男性' : '女性',
-      response.age,
-      response.religion,
-      format(response.testDate, 'yyyy-MM-dd'),
-      response.overallScore,
-      response.isReligious ? '是' : '否',
-      ...Object.values(response.answers)
-    ]);
-
-    const csvContent = [headers, ...csvData]
-      .map(row => row.map(cell => `"${cell}"`).join(','))
-      .join('\n');
-
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `靈性健康檢測資料_${format(new Date(), 'yyyy-MM-dd')}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleDeleteResponse = (id) => {
-    if (confirm('確定要刪除這筆資料嗎？')) {
-      setResponses(prev => prev.filter(response => response.id !== id));
-    }
-  };
-
-  const getScoreColor = (score) => {
-    if (score >= 4.5) return 'text-green-600 bg-green-100';
-    if (score >= 3.5) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
-  };
-
+  // 統計數據
   const stats = {
     total: responses.length,
-    avgScore: responses.length > 0 ? (responses.reduce((sum, r) => sum + r.overallScore, 0) / responses.length).toFixed(2) : 0,
+    avgScore: responses.length > 0 ? (responses.reduce((sum, r) => sum + r.scores.overallScore, 0) / responses.length).toFixed(1) : 0,
     religious: responses.filter(r => r.isReligious).length,
-    nonReligious: responses.filter(r => !r.isReligious).length
-  };
+    genderDistribution: {
+      male: responses.filter(r => r.profile.biologicalGender === 'male').length,
+      female: responses.filter(r => r.profile.biologicalGender === 'female').length,
+      other: responses.filter(r => r.profile.biologicalGender === 'other').length
+    }
+  }
+
+  const handleDeleteResponse = (id) => {
+    if (window.confirm('確定要刪除這筆回應嗎？')) {
+      setResponses(prev => prev.filter(r => r.id !== id))
+    }
+  }
+
+  const handleExportData = () => {
+    const dataStr = JSON.stringify(filteredResponses, null, 2)
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(dataBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `spiritual-health-data-${new Date().toISOString().split('T')[0]}.json`
+    link.click()
+  }
+
+  const getScoreColor = (score) => {
+    if (score >= 5.0) return 'text-green-600 bg-green-50'
+    if (score >= 4.0) return 'text-teal-600 bg-teal-50'
+    if (score >= 3.0) return 'text-yellow-600 bg-yellow-50'
+    if (score >= 2.0) return 'text-orange-600 bg-orange-50'
+    return 'text-red-600 bg-red-50'
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <Settings className="h-8 w-8 text-indigo-600" />
-              <h1 className="text-3xl font-bold text-gray-800">後台管理</h1>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        
+        {/* 頁面標題和操作按鈕 */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
+              <span className="bg-gradient-to-r from-orange-600 via-red-500 to-orange-600 bg-clip-text text-transparent">
+                後台管理系統
+              </span>
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              檢測回應數據管理與統計分析
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Button
+              onClick={onBack}
+              variant="outline"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              返回首頁
+            </Button>
+            
+            <Button
+              onClick={handleExportData}
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm sm:text-base bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              匯出數據
+            </Button>
+          </div>
+        </div>
+
+        {/* 統計卡片 - 響應式網格 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <Card className="border-2 border-blue-200 bg-blue-50/80 backdrop-blur-sm shadow-lg">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Users className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
+                <div>
+                  <p className="text-xs sm:text-sm text-blue-600 font-medium">總回應數</p>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-800">{stats.total}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 border-green-200 bg-green-50/80 backdrop-blur-sm shadow-lg">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <BarChart3 className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" />
+                <div>
+                  <p className="text-xs sm:text-sm text-green-600 font-medium">平均分數</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-800">{stats.avgScore}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 border-purple-200 bg-purple-50/80 backdrop-blur-sm shadow-lg">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <TrendingUp className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600" />
+                <div>
+                  <p className="text-xs sm:text-sm text-purple-600 font-medium">有宗教信仰</p>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-800">{stats.religious}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 border-orange-200 bg-orange-50/80 backdrop-blur-sm shadow-lg">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-orange-600" />
+                <div>
+                  <p className="text-xs sm:text-sm text-orange-600 font-medium">本月新增</p>
+                  <p className="text-xl sm:text-2xl font-bold text-orange-800">{stats.total}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 搜尋和篩選區域 */}
+        <Card className="border-2 border-gray-200 bg-white/80 backdrop-blur-sm shadow-lg mb-6 sm:mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2 sm:gap-3">
+              <Filter className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+              搜尋與篩選
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="search" className="text-sm font-medium text-gray-700">
+                  搜尋姓名或信箱
+                </Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    id="search"
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 text-sm"
+                    placeholder="輸入關鍵字..."
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="gender-filter" className="text-sm font-medium text-gray-700">
+                  性別篩選
+                </Label>
+                <select
+                  id="gender-filter"
+                  value={filterGender}
+                  onChange={(e) => setFilterGender(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                >
+                  <option value="all">全部</option>
+                  <option value="male">男性</option>
+                  <option value="female">女性</option>
+                  <option value="other">其他</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="age-filter" className="text-sm font-medium text-gray-700">
+                  年齡篩選
+                </Label>
+                <select
+                  id="age-filter"
+                  value={filterAge}
+                  onChange={(e) => setFilterAge(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                >
+                  <option value="all">全部</option>
+                  <option value="young">30歲以下</option>
+                  <option value="middle">30-50歲</option>
+                  <option value="senior">50歲以上</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  篩選結果
+                </Label>
+                <div className="flex items-center h-10 px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                  <span className="text-sm text-gray-600">
+                    共 {filteredResponses.length} 筆記錄
+                  </span>
+                </div>
+              </div>
             </div>
-            <p className="text-gray-600">管理問卷回應資料</p>
-          </motion.div>
+          </CardContent>
+        </Card>
 
-          {/* 統計卡片 */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="grid md:grid-cols-4 gap-6 mb-8"
-          >
-            <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">總回應數</p>
-                    <p className="text-2xl font-bold text-indigo-600">{stats.total}</p>
-                  </div>
-                  <Users className="h-8 w-8 text-indigo-600" />
-                </div>
-              </CardContent>
-            </Card>
+        {/* 回應列表 */}
+        <Card className="border-2 border-gray-200 bg-white/80 backdrop-blur-sm shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2 sm:gap-3">
+              <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+              檢測回應列表
+            </CardTitle>
+            <CardDescription className="text-sm sm:text-base">
+              點擊查看詳細資料，或進行管理操作
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {filteredResponses.length === 0 ? (
+              <div className="text-center py-8 sm:py-12">
+                <AlertCircle className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-sm sm:text-base text-gray-500">
+                  {responses.length === 0 ? '尚無檢測回應' : '沒有符合條件的記錄'}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3 sm:space-y-4">
+                {filteredResponses.map((response) => (
+                  <div
+                    key={response.id}
+                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    {/* 基本資訊 */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
+                        <h4 className="font-semibold text-gray-800 text-sm sm:text-base">
+                          {response.profile.name}
+                        </h4>
+                        <div className="flex flex-wrap gap-1 sm:gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            {response.profile.biologicalGender === 'male' ? '男性' : 
+                             response.profile.biologicalGender === 'female' ? '女性' : '其他'}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {response.profile.age}歲
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {response.profile.city}
+                          </Badge>
+                          {response.isReligious && (
+                            <Badge className="bg-purple-100 text-purple-700 text-xs">
+                              有宗教信仰
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">
+                        {response.profile.email} | {response.profile.occupation}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        檢測時間：{response.timestamp}
+                      </p>
+                    </div>
 
-            <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">平均分數</p>
-                    <p className="text-2xl font-bold text-green-600">{stats.avgScore}</p>
-                  </div>
-                  <BarChart3 className="h-8 w-8 text-green-600" />
-                </div>
-              </CardContent>
-            </Card>
+                    {/* 分數顯示 */}
+                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">總分</p>
+                        <Badge className={`px-2 py-1 text-sm font-bold ${getScoreColor(response.scores.overallScore)}`}>
+                          {response.scores.overallScore.toFixed(1)}
+                        </Badge>
+                      </div>
+                    </div>
 
-            <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">宗教信仰者</p>
-                    <p className="text-2xl font-bold text-purple-600">{stats.religious}</p>
-                  </div>
-                  <Calendar className="h-8 w-8 text-purple-600" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">非宗教信仰者</p>
-                    <p className="text-2xl font-bold text-orange-600">{stats.nonReligious}</p>
-                  </div>
-                  <Users className="h-8 w-8 text-orange-600" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* 控制面板 */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm mb-6">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Filter className="h-5 w-5" />
-                  <span>篩選與搜尋</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-6 gap-4">
-                  {/* 搜尋 */}
-                  <div className="md:col-span-2">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        placeholder="搜尋姓名..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
-                      />
+                    {/* 操作按鈕 */}
+                    <div className="flex gap-2 flex-shrink-0">
+                      <Button
+                        onClick={() => {
+                          setSelectedResponse(response)
+                          setShowDetails(true)
+                        }}
+                        size="sm"
+                        variant="outline"
+                        className="px-2 sm:px-3 py-1 text-xs sm:text-sm"
+                      >
+                        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                        查看
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteResponse(response.id)}
+                        size="sm"
+                        variant="outline"
+                        className="px-2 sm:px-3 py-1 text-xs sm:text-sm text-red-600 border-red-200 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                      </Button>
                     </div>
                   </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-                  {/* 性別篩選 */}
-                  <Select value={filterGender} onValueChange={setFilterGender}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="性別" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">所有性別</SelectItem>
-                      <SelectItem value="male">男性</SelectItem>
-                      <SelectItem value="female">女性</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  {/* 宗教篩選 */}
-                  <Select value={filterReligion} onValueChange={setFilterReligion}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="宗教信仰" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">所有宗教</SelectItem>
-                      <SelectItem value="無宗教信仰">無宗教信仰</SelectItem>
-                      <SelectItem value="基督教">基督教</SelectItem>
-                      <SelectItem value="天主教">天主教</SelectItem>
-                      <SelectItem value="佛教">佛教</SelectItem>
-                      <SelectItem value="道教">道教</SelectItem>
-                      <SelectItem value="伊斯蘭教">伊斯蘭教</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  {/* 排序方式 */}
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="排序方式" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="date">檢測日期</SelectItem>
-                      <SelectItem value="name">姓名</SelectItem>
-                      <SelectItem value="score">分數</SelectItem>
-                      <SelectItem value="age">年齡</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  {/* 匯出按鈕 */}
+        {/* 詳細資料彈窗 */}
+        {showDetails && selectedResponse && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-800">
+                    詳細檢測結果
+                  </h3>
                   <Button
-                    onClick={handleExportCSV}
-                    className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700"
-                  >
-                    <Download className="h-4 w-4" />
-                    <span>匯出 CSV</span>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* 資料表格 */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>問卷回應資料 ({filteredResponses.length} 筆)</span>
-                  <Button
+                    onClick={() => setShowDetails(false)}
                     variant="outline"
                     size="sm"
-                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    className="px-3 py-1"
                   >
-                    {sortOrder === 'asc' ? '升序' : '降序'}
+                    關閉
                   </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>姓名</TableHead>
-                        <TableHead>性別</TableHead>
-                        <TableHead>年齡</TableHead>
-                        <TableHead>宗教信仰</TableHead>
-                        <TableHead>檢測日期</TableHead>
-                        <TableHead>整體分數</TableHead>
-                        <TableHead>類型</TableHead>
-                        <TableHead>操作</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredResponses.map((response) => (
-                        <TableRow key={response.id} className="hover:bg-gray-50">
-                          <TableCell className="font-medium">{response.id}</TableCell>
-                          <TableCell>{response.name}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
-                              {response.gender === 'male' ? '男性' : '女性'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{response.age}</TableCell>
-                          <TableCell>{response.religion}</TableCell>
-                          <TableCell>
-                            {format(response.testDate, 'yyyy-MM-dd', { locale: zhTW })}
-                          </TableCell>
-                          <TableCell>
-                            <Badge className={getScoreColor(response.overallScore)}>
-                              {response.overallScore.toFixed(1)}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={response.isReligious ? "default" : "secondary"}>
-                              {response.isReligious ? '宗教' : '非宗教'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="flex items-center space-x-1"
-                              >
-                                <Eye className="h-3 w-3" />
-                                <span>查看</span>
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDeleteResponse(response.id)}
-                                className="flex items-center space-x-1 text-red-600 hover:text-red-700"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                                <span>刪除</span>
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
                 </div>
 
-                {filteredResponses.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    沒有找到符合條件的資料
+                {/* 個人資料 */}
+                <div className="mb-4 sm:mb-6">
+                  <h4 className="font-semibold text-gray-800 mb-3">個人資料</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-sm">
+                    <p><strong>姓名：</strong>{selectedResponse.profile.name}</p>
+                    <p><strong>年齡：</strong>{selectedResponse.profile.age}歲</p>
+                    <p><strong>性別：</strong>{selectedResponse.profile.biologicalGender === 'male' ? '男性' : 
+                                                selectedResponse.profile.biologicalGender === 'female' ? '女性' : '其他'}</p>
+                    <p><strong>國籍：</strong>{selectedResponse.profile.nationality}</p>
+                    <p><strong>居住城市：</strong>{selectedResponse.profile.city}</p>
+                    <p><strong>職業：</strong>{selectedResponse.profile.occupation}</p>
+                    <p className="sm:col-span-2"><strong>信箱：</strong>{selectedResponse.profile.email}</p>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
+                </div>
+
+                {/* 分數詳情 */}
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-3">檢測分數</h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="font-medium">整體分數</span>
+                      <Badge className={`px-3 py-1 font-bold ${getScoreColor(selectedResponse.scores.overallScore)}`}>
+                        {selectedResponse.scores.overallScore.toFixed(1)} / 6.0
+                      </Badge>
+                    </div>
+                    {Object.entries(selectedResponse.scores.domainScores).map(([domain, score]) => (
+                      <div key={domain} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm">{domain}</span>
+                        <Badge className={`px-2 py-1 text-sm ${getScoreColor(score)}`}>
+                          {score.toFixed(1)}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Admin;
+export default Admin
