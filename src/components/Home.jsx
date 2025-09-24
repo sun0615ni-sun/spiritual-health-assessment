@@ -58,7 +58,7 @@ const Home = ({ onStartQuestionnaire }) => {
             </div>
             <div className="text-center sm:text-left min-w-0">
               <div className="text-xs sm:text-sm font-medium text-gray-800 leading-tight">財團法人新北市</div>
-              <div className="text-xs sm:text-sm font-bold text-orange-600 leading-tight">為愛前行基金會</div>
+              <div className="text-xs sm:text-sm font-bold text-orange-600 leading-tight">為愛前行社會福利基金會</div>
             </div>
           </div>
           
