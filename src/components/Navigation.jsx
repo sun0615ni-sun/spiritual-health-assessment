@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
-import { Home, FileText, User, BarChart3, Settings, Heart, GraduationCap } from 'lucide-react'
+import { Home, FileText, User, BarChart3, Settings } from 'lucide-react'
 
 const Navigation = ({ currentPage, onNavigate, totalResponses = 0 }) => {
   const navItems = [
@@ -17,19 +17,42 @@ const Navigation = ({ currentPage, onNavigate, totalResponses = 0 }) => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-3">
           {/* Logo 區域 */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            {/* 為愛前行基金會 LOGO */}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-                <Heart className="w-4 h-4 text-white" />
-              </div>
-              <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-4 h-4 text-white" />
-              </div>
+              <img 
+                src="/afl-logo.png" 
+                alt="財團法人新北市為愛前行基金會" 
+                className="h-10 w-auto object-contain"
+                onError={(e) => {
+                  console.log('AFL logo failed to load');
+                  e.target.style.display = 'none';
+                }}
+              />
             </div>
-            <div className="hidden md:block">
-              <h1 className="text-lg font-bold bg-gradient-to-r from-orange-600 to-teal-600 bg-clip-text text-transparent">
-                靈性健康檢測系統
-              </h1>
+            
+            {/* 台大生命教育中心 LOGO */}
+            <div className="flex items-center gap-2">
+              <img 
+                src="/ntu-logo.png" 
+                alt="國立台灣大學生命教育研發育成中心" 
+                className="h-10 w-auto object-contain"
+                onError={(e) => {
+                  console.log('NTU logo failed to load');
+                  e.target.style.display = 'none';
+                }}
+              />
+            </div>
+          </div>
+          
+          {/* 系統標題和機構名稱 */}
+          <div className="flex-1 text-center">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-orange-600 to-teal-600 bg-clip-text text-transparent">
+              靈性健康檢測系統
+            </h1>
+            <div className="text-xs text-gray-500 mt-1">
+              <div>財團法人新北市為愛前行基金會</div>
+              <div>國立台灣大學生命教育研發育成中心</div>
             </div>
           </div>
 
@@ -45,19 +68,19 @@ const Navigation = ({ currentPage, onNavigate, totalResponses = 0 }) => {
                   onClick={() => onNavigate(item.id)}
                   variant={isActive ? "default" : "ghost"}
                   size="sm"
-                  className={`relative transition-all duration-200 ${
+                  className={
                     isActive
                       ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
                       : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
-                  }`}
+                  }
                 >
                   <IconComponent className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">{item.label}</span>
                   
                   {/* 後台管理的回應數量徽章 */}
                   {item.id === 'admin' && totalResponses > 0 && (
-                    <Badge 
-                      variant="secondary" 
+                    <Badge
+                      variant="secondary"
                       className="ml-2 bg-teal-100 text-teal-700 text-xs"
                     >
                       {totalResponses}
@@ -66,13 +89,6 @@ const Navigation = ({ currentPage, onNavigate, totalResponses = 0 }) => {
                 </Button>
               )
             })}
-          </div>
-
-          {/* 機構標識 */}
-          <div className="hidden lg:flex items-center gap-2 text-xs text-gray-500">
-            <span>為愛前行基金會</span>
-            <span>×</span>
-            <span>台大生命教育中心</span>
           </div>
         </div>
       </div>
