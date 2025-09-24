@@ -1,528 +1,413 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import { Button } from './ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { Badge } from './ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Progress } from './ui/progress'
+import { Badge } from './ui/badge'
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
-} from 'recharts'
-import { 
-  ChevronLeft, Download, Share2, Heart, Users, Leaf, Star, 
-  TrendingUp, Award, Target, Lightbulb, Sun, Moon, Calendar, Clock
+  ArrowLeft, 
+  Download, 
+  Share2, 
+  BarChart3, 
+  TrendingUp, 
+  Heart, 
+  Users, 
+  Leaf, 
+  Star,
+  AlertCircle,
+  CheckCircle,
+  Info
 } from 'lucide-react'
 import { calculateScores } from '../scoring'
-import { format } from 'date-fns'
-import { zhTW } from 'date-fns/locale'
 
-const Report = ({ data, onBack, onRestart }) => {
+const Report = ({ answers, profileData, isReligious, onBack, onRestart }) => {
   const [activeTab, setActiveTab] = useState('overview')
   
-  const scores = useMemo(() => {
-    if (!data?.answers) return null
-    return calculateScores(data.answers)
-  }, [data])
+  const scores = calculateScores(answers, isReligious)
 
-  if (!scores || !data) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50 flex items-center justify-center">
-        <Card className="max-w-md bg-white border-orange-100 shadow-xl">
-          <CardContent className="p-6 text-center">
-            <p className="text-gray-600 mb-4">載入報告中...</p>
-            <Button 
-              onClick={onBack}
-              variant="outline"
-              className="border-orange-200 text-orange-600 hover:bg-orange-50"
-            >
-              返回
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
+  // 領域圖示映射
+  const domainIcons = {
+    '與自己的關係': Heart,
+    '與他人的關係': Users,
+    '與自然的關係': Leaf,
+    '與超越者的關係': Star
   }
 
-  const getScoreColor = (score) => {
-    if (score >= 4.5) return 'text-teal-600 bg-teal-100'
-    if (score >= 3.5) return 'text-orange-500 bg-orange-100'
-    return 'text-red-500 bg-red-100'
-  }
-
+  // 分數等級判定
   const getScoreLevel = (score) => {
-    if (score >= 4.5) return '優秀'
-    if (score >= 3.5) return '良好'
-    return '待加強'
+    if (score >= 5.0) return { level: '優秀', color: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' }
+    if (score >= 4.0) return { level: '良好', color: 'bg-teal-500', textColor: 'text-teal-700', bgColor: 'bg-teal-50' }
+    if (score >= 3.0) return { level: '普通', color: 'bg-yellow-500', textColor: 'text-yellow-700', bgColor: 'bg-yellow-50' }
+    if (score >= 2.0) return { level: '待改善', color: 'bg-orange-500', textColor: 'text-orange-700', bgColor: 'bg-orange-50' }
+    return { level: '需關注', color: 'bg-red-500', textColor: 'text-red-700', bgColor: 'bg-red-50' }
   }
 
-  const domainData = [
-    { name: '與自己', score: scores.domains.self, icon: Heart, color: 'from-orange-500 to-red-500' },
-    { name: '與他人', score: scores.domains.others, icon: Users, color: 'from-teal-500 to-cyan-500' },
-    { name: '與自然', score: scores.domains.nature, icon: Leaf, color: 'from-orange-500 to-red-500' },
-    { name: '與超越者', score: scores.domains.transcendent, icon: Star, color: 'from-teal-500 to-cyan-500' }
-  ]
+  // 建議內容
+  const getRecommendations = (domainScores) => {
+    const recommendations = []
+    
+    Object.entries(domainScores).forEach(([domain, score]) => {
+      if (score < 3.0) {
+        switch (domain) {
+          case '與自己的關係':
+            recommendations.push({
+              domain,
+              title: '自我覺察與成長',
+              suggestions: [
+                '每日進行10-15分鐘的冥想或正念練習',
+                '寫日記記錄內心感受和想法',
+                '設定個人成長目標並定期檢視',
+                '學習情緒管理技巧'
+              ]
+            })
+            break
+          case '與他人的關係':
+            recommendations.push({
+              domain,
+              title: '人際關係建立',
+              suggestions: [
+                '主動關心身邊的家人朋友',
+                '參與社區活動或志工服務',
+                '練習同理心和傾聽技巧',
+                '建立支持性的社交網絡'
+              ]
+            })
+            break
+          case '與自然的關係':
+            recommendations.push({
+              domain,
+              title: '自然連結體驗',
+              suggestions: [
+                '每週安排戶外活動時間',
+                '觀察和欣賞自然美景',
+                '參與環保行動或生態保護',
+                '在生活中融入自然元素'
+              ]
+            })
+            break
+          case '與超越者的關係':
+            if (isReligious) {
+              recommendations.push({
+                domain,
+                title: '靈性修養深化',
+                suggestions: [
+                  '定期參與宗教活動或靈修',
+                  '閱讀靈性成長相關書籍',
+                  '與靈性導師或同修交流',
+                  '在日常生活中實踐信仰價值'
+                ]
+              })
+            } else {
+              recommendations.push({
+                domain,
+                title: '生命意義探索',
+                suggestions: [
+                  '思考人生目標和價值觀',
+                  '參與有意義的公益活動',
+                  '探索哲學或人文思想',
+                  '培養感恩和敬畏之心'
+                ]
+              })
+            }
+            break
+        }
+      }
+    })
+    
+    return recommendations
+  }
 
-  const aspectData = [
-    { aspect: '自我覺察', score: scores.aspects.selfAwareness },
-    { aspect: '生命意義', score: scores.aspects.lifeMeaning },
-    { aspect: '內在平靜', score: scores.aspects.innerPeace },
-    { aspect: '感恩寬恕', score: scores.aspects.gratitudeForgiveness },
-    { aspect: '愛與同理', score: scores.aspects.loveEmpathy },
-    { aspect: '謙卑敬畏', score: scores.aspects.humilityAwe },
-    { aspect: '盼望信心', score: scores.aspects.hopeFaith }
-  ]
+  const recommendations = getRecommendations(scores.domainScores)
 
-  const practiceRecommendations = [
-    {
-      time: '晨間實踐',
-      icon: Sun,
-      color: 'from-orange-400 to-yellow-400',
-      practices: [
-        '每日10分鐘靜心冥想',
-        '感恩日記書寫',
-        '正念呼吸練習',
-        '設定當日意圖'
-      ]
-    },
-    {
-      time: '日間實踐', 
-      icon: Clock,
-      color: 'from-teal-400 to-cyan-400',
-      practices: [
-        '工作中的正念時刻',
-        '與他人的真誠連結',
-        '欣賞自然美景',
-        '實踐同理心傾聽'
-      ]
-    },
-    {
-      time: '晚間實踐',
-      icon: Moon,
-      color: 'from-purple-400 to-indigo-400',
-      practices: [
-        '反思今日學習',
-        '寬恕練習',
-        '感謝禱告或冥想',
-        '規劃明日成長'
-      ]
-    },
-    {
-      time: '週間實踐',
-      icon: Calendar,
-      color: 'from-green-400 to-emerald-400',
-      practices: [
-        '參與志工服務',
-        '親近大自然',
-        '深度靈性閱讀',
-        '參加靈性成長課程'
-      ]
-    }
-  ]
-
-  const spiritualPrinciples = [
-    { principle: '覺察當下', description: '培養對當下時刻的敏銳覺察力' },
-    { principle: '感恩之心', description: '在日常生活中培養感恩的態度' },
-    { principle: '慈悲寬恕', description: '對自己和他人展現慈悲與寬恕' },
-    { principle: '謙卑學習', description: '保持謙卑的心態持續學習成長' },
-    { principle: '服務奉獻', description: '透過服務他人找到生命的意義' },
-    { principle: '內在平靜', description: '在忙碌中保持內心的寧靜' },
-    { principle: '信心希望', description: '對未來保持積極的信心與希望' }
+  // 標籤頁內容
+  const tabs = [
+    { id: 'overview', label: '總覽', icon: BarChart3 },
+    { id: 'details', label: '詳細分析', icon: TrendingUp },
+    { id: 'recommendations', label: '改善建議', icon: Info }
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50 py-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-        {/* 報告標題 */}
-        <Card className="mb-8 bg-white border-orange-100 shadow-xl">
-          <CardHeader className="text-center pb-6">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-                <Award className="w-6 h-6 text-white" />
-              </div>
-              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-teal-600 bg-clip-text text-transparent">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50">
+      <div className="w-full max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        
+        {/* 頁面標題和操作按鈕 */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
+              <span className="bg-gradient-to-r from-orange-600 via-red-500 to-orange-600 bg-clip-text text-transparent">
                 靈性健康檢測報告
-              </CardTitle>
-            </div>
-            
-            {data.profile && (
-              <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
-                <Badge variant="outline" className="border-orange-200 text-orange-700">
-                  {data.profile.name}
-                </Badge>
-                <Badge variant="outline" className="border-teal-200 text-teal-700">
-                  {data.profile.gender === 'male' ? '男性' : data.profile.gender === 'female' ? '女性' : '其他'}
-                </Badge>
-                {data.profile.birthDate && (
-                  <Badge variant="outline" className="border-gray-200 text-gray-700">
-                    {format(data.profile.birthDate, 'yyyy年MM月dd日', { locale: zhTW })}
-                  </Badge>
-                )}
-                <Badge variant="outline" className="border-gray-200 text-gray-700">
-                  檢測日期：{format(data.profile.testDate, 'yyyy年MM月dd日', { locale: zhTW })}
-                </Badge>
-              </div>
-            )}
-          </CardHeader>
-        </Card>
-
-        {/* 標籤頁導航 */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-white border border-orange-100 shadow-sm">
-            <TabsTrigger 
-              value="overview" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-500 data-[state=active]:text-white"
-            >
-              總覽
-            </TabsTrigger>
-            <TabsTrigger 
-              value="domains"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white"
-            >
-              四領域
-            </TabsTrigger>
-            <TabsTrigger 
-              value="aspects"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-500 data-[state=active]:text-white"
-            >
-              七面向
-            </TabsTrigger>
-            <TabsTrigger 
-              value="recommendations"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white"
-            >
-              建議
-            </TabsTrigger>
-          </TabsList>
-
-          {/* 總覽標籤 */}
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* 總分卡片 */}
-              <Card className="bg-gradient-to-br from-orange-100 to-red-100 border-orange-200">
-                <CardHeader className="text-center">
-                  <CardTitle className="text-orange-700">總體靈性健康分數</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <div className="text-4xl font-bold text-orange-600 mb-2">
-                    {scores.total.toFixed(1)}
-                  </div>
-                  <div className="text-lg text-orange-700 mb-4">
-                    {getScoreLevel(scores.total)}
-                  </div>
-                  <Progress 
-                    value={(scores.total / 6) * 100} 
-                    className="h-3 bg-orange-200"
-                  />
-                </CardContent>
-              </Card>
-
-              {/* 平均分卡片 */}
-              <Card className="bg-gradient-to-br from-teal-100 to-cyan-100 border-teal-200">
-                <CardHeader className="text-center">
-                  <CardTitle className="text-teal-700">平均分數</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <div className="text-4xl font-bold text-teal-600 mb-2">
-                    {scores.average.toFixed(1)}
-                  </div>
-                  <div className="text-lg text-teal-700 mb-4">
-                    滿分 6.0 分
-                  </div>
-                  <Progress 
-                    value={(scores.average / 6) * 100} 
-                    className="h-3 bg-teal-200"
-                  />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* 四領域快速概覽 */}
-            <Card className="bg-white border-orange-100 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <TrendingUp className="w-5 h-5 text-orange-600" />
-                  四領域概覽
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {domainData.map((domain, index) => {
-                    const IconComponent = domain.icon
-                    return (
-                      <div key={index} className="text-center">
-                        <div className={`w-16 h-16 mx-auto mb-3 bg-gradient-to-br ${domain.color} rounded-xl flex items-center justify-center`}>
-                          <IconComponent className="w-8 h-8 text-white" />
-                        </div>
-                        <div className="text-sm font-medium text-gray-700 mb-1">
-                          {domain.name}
-                        </div>
-                        <div className="text-lg font-bold text-gray-800">
-                          {domain.score.toFixed(1)}
-                        </div>
-                        <Badge className={`text-xs ${getScoreColor(domain.score)}`}>
-                          {getScoreLevel(domain.score)}
-                        </Badge>
-                      </div>
-                    )
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* 四領域標籤 */}
-          <TabsContent value="domains" className="space-y-6">
-            <Card className="bg-white border-orange-100 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <BarChart className="w-5 h-5 text-orange-600" />
-                  四領域詳細分析
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80 mb-6">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={domainData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                      <YAxis domain={[0, 6]} tick={{ fontSize: 12 }} />
-                      <Tooltip 
-                        formatter={(value) => [value.toFixed(2), '分數']}
-                        labelStyle={{ color: '#374151' }}
-                        contentStyle={{ 
-                          backgroundColor: 'white', 
-                          border: '1px solid #fed7aa',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <Bar 
-                        dataKey="score" 
-                        fill="url(#gradient)"
-                        radius={[4, 4, 0, 0]}
-                      />
-                      <defs>
-                        <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#f97316" />
-                          <stop offset="100%" stopColor="#dc2626" />
-                        </linearGradient>
-                      </defs>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  {domainData.map((domain, index) => {
-                    const IconComponent = domain.icon
-                    return (
-                      <Card key={index} className="border-gray-100">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className={`w-8 h-8 bg-gradient-to-br ${domain.color} rounded-lg flex items-center justify-center`}>
-                              <IconComponent className="w-4 h-4 text-white" />
-                            </div>
-                            <div className="font-semibold text-gray-800">
-                              {domain.name}的關係
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-2xl font-bold text-gray-800">
-                              {domain.score.toFixed(1)}
-                            </span>
-                            <Badge className={getScoreColor(domain.score)}>
-                              {getScoreLevel(domain.score)}
-                            </Badge>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* 七面向標籤 */}
-          <TabsContent value="aspects" className="space-y-6">
-            <Card className="bg-white border-orange-100 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <Target className="w-5 h-5 text-teal-600" />
-                  七面向雷達圖分析
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-96 mb-6">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={aspectData}>
-                      <PolarGrid stroke="#e5e7eb" />
-                      <PolarAngleAxis 
-                        dataKey="aspect" 
-                        tick={{ fontSize: 12, fill: '#374151' }}
-                      />
-                      <PolarRadiusAxis 
-                        angle={90} 
-                        domain={[0, 6]} 
-                        tick={{ fontSize: 10, fill: '#6b7280' }}
-                      />
-                      <Radar
-                        name="分數"
-                        dataKey="score"
-                        stroke="#0d9488"
-                        fill="#0d9488"
-                        fillOpacity={0.3}
-                        strokeWidth={2}
-                      />
-                      <Tooltip 
-                        formatter={(value) => [value.toFixed(2), '分數']}
-                        labelStyle={{ color: '#374151' }}
-                        contentStyle={{ 
-                          backgroundColor: 'white', 
-                          border: '1px solid #5eead4',
-                          borderRadius: '8px'
-                        }}
-                      />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </div>
-
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {aspectData.map((aspect, index) => (
-                    <Card key={index} className="border-gray-100">
-                      <CardContent className="p-4">
-                        <div className="font-medium text-gray-800 mb-2">
-                          {aspect.aspect}
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xl font-bold text-gray-800">
-                            {aspect.score.toFixed(1)}
-                          </span>
-                          <Badge className={getScoreColor(aspect.score)}>
-                            {getScoreLevel(aspect.score)}
-                          </Badge>
-                        </div>
-                        <Progress 
-                          value={(aspect.score / 6) * 100} 
-                          className="h-2 mt-2"
-                        />
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* 建議標籤 */}
-          <TabsContent value="recommendations" className="space-y-6">
-            {/* 日常實踐建議 */}
-            <Card className="bg-white border-orange-100 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <Lightbulb className="w-5 h-5 text-orange-600" />
-                  日常實踐建議
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {practiceRecommendations.map((practice, index) => {
-                    const IconComponent = practice.icon
-                    return (
-                      <Card key={index} className="border-gray-100">
-                        <CardHeader className="pb-3">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 bg-gradient-to-br ${practice.color} rounded-lg flex items-center justify-center`}>
-                              <IconComponent className="w-5 h-5 text-white" />
-                            </div>
-                            <CardTitle className="text-lg text-gray-800">
-                              {practice.time}
-                            </CardTitle>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <ul className="space-y-2">
-                            {practice.practices.map((item, idx) => (
-                              <li key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-                                <div className="w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
-                                {item}
-                              </li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                    )
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 靈修七原則 */}
-            <Card className="bg-white border-teal-100 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <Star className="w-5 h-5 text-teal-600" />
-                  靈修七原則
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {spiritualPrinciples.map((principle, index) => (
-                    <div key={index} className="flex gap-3 p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg border border-teal-100">
-                      <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <div className="font-semibold text-teal-700 mb-1">
-                          {principle.principle}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {principle.description}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* 底部操作按鈕 */}
-        <div className="flex flex-wrap justify-between items-center gap-4 mt-8">
-          <div className="flex gap-3">
+              </span>
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              {profileData?.name && `${profileData.name}，`}您的個人化靈性健康分析結果
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <Button
               onClick={onBack}
               variant="outline"
-              className="border-gray-300 text-gray-600 hover:bg-gray-50"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
             >
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              返回資料填寫
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              返回修改
             </Button>
             
             <Button
-              onClick={onRestart}
-              variant="outline"
-              className="border-orange-200 text-orange-600 hover:bg-orange-50"
-            >
-              重新檢測
-            </Button>
-          </div>
-
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="border-teal-200 text-teal-600 hover:bg-teal-50"
-            >
-              <Share2 className="w-4 h-4 mr-2" />
-              分享報告
-            </Button>
-            
-            <Button
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+              onClick={() => window.print()}
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm sm:text-base bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <Download className="w-4 h-4 mr-2" />
-              下載 PDF
+              下載報告
             </Button>
           </div>
+        </div>
+
+        {/* 標籤頁導航 - 響應式 */}
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-1 mb-6 sm:mb-8 bg-white rounded-lg p-1 shadow-md">
+          {tabs.map((tab) => {
+            const IconComponent = tab.icon
+            return (
+              <Button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                variant={activeTab === tab.id ? "default" : "ghost"}
+                className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-medium transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
+                    : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
+                }`}
+              >
+                <IconComponent className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.split('')[0]}</span>
+              </Button>
+            )
+          })}
+        </div>
+
+        {/* 總覽標籤頁 */}
+        {activeTab === 'overview' && (
+          <div className="space-y-4 sm:space-y-6">
+            
+            {/* 整體分數卡片 */}
+            <Card className="border-2 border-orange-200 bg-white/80 backdrop-blur-sm shadow-xl">
+              <CardHeader className="text-center pb-4 sm:pb-6">
+                <CardTitle className="text-xl sm:text-2xl font-bold text-gray-800">
+                  整體靈性健康分數
+                </CardTitle>
+                <div className="mt-4 sm:mt-6">
+                  <div className="text-4xl sm:text-5xl md:text-6xl font-bold mb-2 sm:mb-4">
+                    <span className={`${getScoreLevel(scores.overallScore).textColor}`}>
+                      {scores.overallScore.toFixed(1)}
+                    </span>
+                    <span className="text-lg sm:text-xl text-gray-500 ml-2">/6.0</span>
+                  </div>
+                  <Badge 
+                    className={`px-3 sm:px-4 py-1 sm:py-2 text-sm sm:text-base font-bold ${getScoreLevel(scores.overallScore).bgColor} ${getScoreLevel(scores.overallScore).textColor} border-0`}
+                  >
+                    {getScoreLevel(scores.overallScore).level}
+                  </Badge>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* 四領域分數 - 響應式網格 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {Object.entries(scores.domainScores).map(([domain, score]) => {
+                const IconComponent = domainIcons[domain]
+                const scoreLevel = getScoreLevel(score)
+                
+                return (
+                  <Card key={domain} className="border-2 border-orange-200 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+                    <CardHeader className="pb-2 sm:pb-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 flex-shrink-0" />
+                        <CardTitle className="text-sm sm:text-base font-bold text-gray-800 leading-tight">
+                          {domain}
+                        </CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center">
+                        <div className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3">
+                          <span className={scoreLevel.textColor}>
+                            {score.toFixed(1)}
+                          </span>
+                        </div>
+                        <Progress 
+                          value={(score / 6) * 100} 
+                          className="w-full h-2 sm:h-3 mb-2 sm:mb-3"
+                        />
+                        <Badge 
+                          className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-bold ${scoreLevel.bgColor} ${scoreLevel.textColor} border-0`}
+                        >
+                          {scoreLevel.level}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+
+            {/* 快速洞察 */}
+            <Card className="border-2 border-teal-200 bg-teal-50/80 backdrop-blur-sm shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl font-bold text-teal-800 flex items-center gap-2 sm:gap-3">
+                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                  快速洞察
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <TrendingUp className="w-4 h-4 text-teal-600 flex-shrink-0" />
+                    <span className="text-teal-700">
+                      最強領域：{Object.entries(scores.domainScores).reduce((a, b) => scores.domainScores[a[0]] > scores.domainScores[b[0]] ? a : b)[0]}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <AlertCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                    <span className="text-orange-700">
+                      改善空間：{Object.entries(scores.domainScores).reduce((a, b) => scores.domainScores[a[0]] < scores.domainScores[b[0]] ? a : b)[0]}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* 詳細分析標籤頁 */}
+        {activeTab === 'details' && (
+          <div className="space-y-4 sm:space-y-6">
+            {Object.entries(scores.aspectScores).map(([domain, aspects]) => {
+              const IconComponent = domainIcons[domain]
+              
+              return (
+                <Card key={domain} className="border-2 border-orange-200 bg-white/80 backdrop-blur-sm shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2 sm:gap-3">
+                      <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+                      {domain}
+                    </CardTitle>
+                    <CardDescription className="text-sm sm:text-base">
+                      領域總分：{scores.domainScores[domain].toFixed(1)} / 6.0
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3 sm:space-y-4">
+                      {Object.entries(aspects).map(([aspect, score]) => {
+                        const scoreLevel = getScoreLevel(score)
+                        
+                        return (
+                          <div key={aspect} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-800 text-sm sm:text-base mb-1 sm:mb-2">
+                                {aspect}
+                              </h4>
+                              <Progress 
+                                value={(score / 6) * 100} 
+                                className="w-full h-2 sm:h-3"
+                              />
+                            </div>
+                            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                              <span className="text-lg sm:text-xl font-bold text-gray-800">
+                                {score.toFixed(1)}
+                              </span>
+                              <Badge 
+                                className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-bold ${scoreLevel.bgColor} ${scoreLevel.textColor} border-0`}
+                              >
+                                {scoreLevel.level}
+                              </Badge>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        )}
+
+        {/* 改善建議標籤頁 */}
+        {activeTab === 'recommendations' && (
+          <div className="space-y-4 sm:space-y-6">
+            {recommendations.length > 0 ? (
+              recommendations.map((rec, index) => (
+                <Card key={index} className="border-2 border-blue-200 bg-blue-50/80 backdrop-blur-sm shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-lg sm:text-xl font-bold text-blue-800 flex items-center gap-2 sm:gap-3">
+                      <Info className="w-5 h-5 sm:w-6 sm:h-6" />
+                      {rec.title}
+                    </CardTitle>
+                    <CardDescription className="text-sm sm:text-base text-blue-700">
+                      針對「{rec.domain}」的改善建議
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 sm:space-y-3">
+                      {rec.suggestions.map((suggestion, idx) => (
+                        <li key={idx} className="flex items-start gap-2 sm:gap-3 text-sm sm:text-base text-blue-800">
+                          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <span>{suggestion}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <Card className="border-2 border-green-200 bg-green-50/80 backdrop-blur-sm shadow-lg">
+                <CardContent className="text-center py-8 sm:py-12">
+                  <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-green-600 mx-auto mb-4 sm:mb-6" />
+                  <h3 className="text-lg sm:text-xl font-bold text-green-800 mb-2 sm:mb-4">
+                    恭喜！您的靈性健康狀況良好
+                  </h3>
+                  <p className="text-sm sm:text-base text-green-700 px-4">
+                    您在各個領域都表現優秀，請繼續保持目前的生活方式和靈性修養。
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {/* 底部操作區域 */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200">
+          <Button
+            onClick={onRestart}
+            variant="outline"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+          >
+            重新檢測
+          </Button>
+          
+          <Button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: '靈性健康檢測報告',
+                  text: `我的靈性健康總分是 ${scores.overallScore.toFixed(1)}/6.0`,
+                  url: window.location.href
+                })
+              }
+            }}
+            className="w-full sm:flex-1 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            分享結果
+          </Button>
+        </div>
+
+        {/* 免責聲明 */}
+        <div className="text-center mt-6 sm:mt-8 p-4 sm:p-6 bg-gray-100 rounded-lg">
+          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+            <strong>免責聲明：</strong>本檢測結果僅供參考，不能替代專業的心理健康評估或醫療建議。
+            如有嚴重的心理健康問題，請尋求專業協助。
+          </p>
         </div>
       </div>
     </div>
