@@ -60,9 +60,10 @@ const Profile = ({ onComplete }) => {
       }
     });
 
-    // Email格式驗證
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = '請輸入有效的電子郵件地址';
+    // Email格式驗證 - 修復正則表達式語法
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      newErrors.email = '請輸入有效的電子信箱地址';
     }
 
     setErrors(newErrors);
