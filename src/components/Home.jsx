@@ -1,163 +1,177 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button.jsx';
-import { Checkbox } from '@/components/ui/checkbox.jsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx';
-import { Heart, Sparkles, Users, Leaf } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react'
+import { Button } from './ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
+import { Checkbox } from './ui/checkbox'
+import { Badge } from './ui/badge'
+import { Heart, Users, Leaf, Star, Building2, GraduationCap } from 'lucide-react'
 
-const Home = ({ onStartAssessment }) => {
-  const [agreed, setAgreed] = useState(false);
+const Home = ({ onStartQuestionnaire }) => {
+  const [agreed, setAgreed] = useState(false)
 
-  const features = [
+  const domains = [
     {
       icon: Heart,
-      title: "與自己的關係",
-      description: "探索內在的自我覺察、生命意義與內在平靜"
+      title: '與自己的關係',
+      description: '自我覺察、生命意義、內在平靜',
+      color: 'bg-gradient-to-br from-orange-100 to-red-100 border-orange-200'
     },
     {
       icon: Users,
-      title: "與他人的關係",
-      description: "培養感恩寬恕的心，以及愛與同理的能力"
+      title: '與他人的關係', 
+      description: '感恩寬恕、愛與同理',
+      color: 'bg-gradient-to-br from-teal-100 to-cyan-100 border-teal-200'
     },
     {
       icon: Leaf,
-      title: "與自然的關係",
-      description: "感受大自然的美好，培養謙卑與敬畏之心"
+      title: '與自然的關係',
+      description: '謙卑敬畏',
+      color: 'bg-gradient-to-br from-orange-100 to-red-100 border-orange-200'
     },
     {
-      icon: Sparkles,
-      title: "與超越者的關係",
-      description: "建立盼望與信心，連結更高的靈性力量"
+      icon: Star,
+      title: '與超越者的關係',
+      description: '盼望信心',
+      color: 'bg-gradient-to-br from-teal-100 to-cyan-100 border-teal-200'
     }
-  ];
+  ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6 leading-tight">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* 機構 LOGO 區域 */}
+        <div className="text-center mb-8">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-6">
+            {/* 為愛前行基金會 */}
+            <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-md border border-orange-100">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                <Heart className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-left">
+                <div className="text-sm text-gray-600">財團法人新北市</div>
+                <div className="font-bold text-orange-600">為愛前行基金會</div>
+              </div>
+            </div>
+
+            {/* 連接線 */}
+            <div className="hidden md:block w-8 h-px bg-gradient-to-r from-orange-300 to-teal-300"></div>
+
+            {/* 台大生命教育中心 */}
+            <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-md border border-teal-100">
+              <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                <GraduationCap className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-left">
+                <div className="text-sm text-gray-600">國立台灣大學</div>
+                <div className="font-bold text-teal-600">生命教育研發育成中心</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 編制者資訊 */}
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-100 to-teal-100 px-4 py-2 rounded-full border border-orange-200">
+            <Building2 className="w-4 h-4 text-orange-600" />
+            <span className="text-sm text-gray-700">編制者：孫效智教授</span>
+          </div>
+        </div>
+
+        {/* 主標題 */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-orange-600 via-red-500 to-teal-600 bg-clip-text text-transparent">
             發現你的靈性力量
-            <br />
-            <span className="text-indigo-600">開啟更平安喜樂的人生</span>
           </h1>
-        </motion.div>
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-6">
+            開啟更平安喜樂的人生
+          </h2>
+          
+          <div className="max-w-3xl mx-auto">
+            <p className="text-base text-gray-600 leading-normal mb-6">
+              您是否曾想過：行程滿檔，為什麼心裡仍有空虛與不安？在人生的十字路口，總是不太確定方向？或是在關係裡，常被情緒牽動、與人誤解？——也許，是時候照顧自己的靈性健康了。
+            </p>
+            
+            <div className="bg-gradient-to-r from-orange-50 to-teal-50 p-6 rounded-xl border border-orange-100 mb-8">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">什麼是靈性健康？</h3>
+              <p className="text-base text-gray-600 leading-normal">
+                能與自己、他人、自然、超越者建立和諧關係，於日常中活出意義與平安。本系統根據四領域七面向十核心指標靈修七原則建構，協助你看見現況、辨識優勢與待加強處，並給出具體可行的成長建議。
+              </p>
+            </div>
+          </div>
+        </div>
 
-        {/* Main Content */}
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <Card className="mb-8 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-2xl text-gray-800">關於靈性健康</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-base text-gray-700 leading-normal mb-3">
-                  您是否曾想過：行程滿檔，為什麼心裡仍有空虛與不安？在人生的十字路口，總是不太確定方向？或是在關係裡，常被情緒牽動、與人誤解？——也許，是時候照顧自己的靈性健康了。
-                </p>
-                <p className="text-base text-gray-700 leading-normal">
-                  靈性健康是指能與自己、他人、自然、超越者建立和諧關係，於日常中活出意義與平安。本系統根據<strong>四領域七面向十核心指標靈修七原則</strong>建構，協助你看見現況、辨識優勢與待加強處，並給出具體可行的成長建議。
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Features Grid */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid md:grid-cols-2 gap-6 mb-8"
-          >
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-              >
-                <Card className="h-full shadow-md hover:shadow-lg transition-shadow duration-300 border-0 bg-white/70 backdrop-blur-sm">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-indigo-100 rounded-lg">
-                        <feature.icon className="h-6 w-6 text-indigo-600" />
-                      </div>
-                      <CardTitle className="text-lg">{feature.title}</CardTitle>
+        {/* 四領域卡片 */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          {domains.map((domain, index) => {
+            const IconComponent = domain.icon
+            return (
+              <Card key={index} className={`${domain.color} hover:shadow-lg transition-all duration-300 hover:scale-105`}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      index % 2 === 0 
+                        ? 'bg-gradient-to-br from-orange-500 to-red-500' 
+                        : 'bg-gradient-to-br from-teal-500 to-cyan-500'
+                    }`}>
+                      <IconComponent className="w-5 h-5 text-white" />
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-gray-600">
-                      {feature.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Agreement and Start */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-          >
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-              <CardContent className="pt-6">
-                <div className="space-y-6">
-                  <div className="flex items-start space-x-3">
-                    <Checkbox 
-                      id="agreement" 
-                      checked={agreed}
-                      onCheckedChange={setAgreed}
-                      className="mt-1"
-                    />
-                    <label htmlFor="agreement" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
-                      我已閱讀並同意資料使用與保密說明：本問卷僅供研究與教學，所有個資將以匿名方式保存，
-                      僅限統計分析，不對外揭露。
-                    </label>
+                    <CardTitle className={`text-lg ${
+                      index % 2 === 0 ? 'text-orange-700' : 'text-teal-700'
+                    }`}>
+                      {domain.title}
+                    </CardTitle>
                   </div>
-                  
-                  <div className="text-center">
-                    <Button 
-                      onClick={onStartAssessment}
-                      disabled={!agreed}
-                      size="lg"
-                      className="px-8 py-3 text-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                    >
-                      開始檢測
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-600 text-sm">
+                    {domain.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
 
-          {/* Footer */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.0 }}
-            className="text-center mt-8 text-gray-600"
+        {/* 同意條款 */}
+        <Card className="mb-8 bg-white border-orange-100 shadow-md">
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-3">
+              <Checkbox 
+                id="agreement" 
+                checked={agreed}
+                onCheckedChange={setAgreed}
+                className="mt-1 border-orange-300 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+              />
+              <div className="flex-1">
+                <label htmlFor="agreement" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
+                  我已閱讀並同意
+                  <Badge variant="outline" className="mx-1 border-teal-300 text-teal-700">
+                    資料使用與保密說明
+                  </Badge>
+                  ：本問卷僅供研究與教學，所有個資將以匿名方式保存，僅限統計分析，不對外揭露。
+                </label>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 開始按鈕 */}
+        <div className="text-center">
+          <Button 
+            onClick={onStartQuestionnaire}
+            disabled={!agreed}
+            size="lg"
+            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <p className="mb-2">
-              <strong>編制者：</strong>孫效智教授
+            開始檢測
+          </Button>
+          
+          {!agreed && (
+            <p className="text-sm text-gray-500 mt-3">
+              請先閱讀並同意資料使用說明
             </p>
-            <p>
-              <strong>編制單位：</strong>臺大生命教育研發育成中心暨為愛前行基金會
-            </p>
-          </motion.div>
+          )}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
