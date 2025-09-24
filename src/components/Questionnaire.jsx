@@ -1,112 +1,141 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from './ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Progress } from './ui/progress'
-import { Badge } from './ui/badge'
-import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react'
+import { RadioGroup, RadioGroupItem } from './ui/radio-group'
+import { Label } from './ui/label'
+import { ArrowLeft, ArrowRight, CheckCircle, RotateCcw } from 'lucide-react'
 import { questions } from '../questions'
 
 const Questionnaire = ({ onComplete, onBack }) => {
-  const [isReligious, setIsReligious] = useState(null)
-  const [currentQuestion, setCurrentQuestion] = useState(0)
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
+  const [isReligious, setIsReligious] = useState(null)
+  const [showReligiousPrompt, setShowReligiousPrompt] = useState(true)
 
-  const currentQuestions = isReligious === null ? [] : 
-    isReligious ? questions.religious : questions.nonReligious
+  const currentQuestion = questions[currentQuestionIndex]
+  const totalQuestions = questions.length
+  const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100
 
-  const totalQuestions = currentQuestions.length
-  const progress = totalQuestions > 0 ? ((currentQuestion + 1) / totalQuestions) * 100 : 0
+  // 檢查是否為宗教相關問題
+  const isReligiousQuestion = currentQuestion?.category === 'religious'
+
+  // 如果不是宗教信仰者且遇到宗教問題，自動跳過
+  useEffect(() => {
+    if (isReligious === false && isReligiousQuestion) {
+      // 自動設為中性答案並跳到下一題
+      setAnswers(prev => ({
+        ...prev,
+        [currentQuestion.id]: 4 // 中性答案
+      }))
+      
+      if (currentQuestionIndex < totalQuestions - 1) {
+        setTimeout(() => {
+          setCurrentQuestionIndex(prev => prev + 1)
+        }, 300)
+      }
+    }
+  }, [currentQuestionIndex, isReligious, isReligiousQuestion, currentQuestion, totalQuestions])
 
   const handleReligiousChoice = (choice) => {
     setIsReligious(choice)
-    setCurrentQuestion(0)
-    setAnswers({})
+    setShowReligiousPrompt(false)
   }
 
-  const handleAnswer = (score) => {
-    const questionId = currentQuestions[currentQuestion]?.id
-    if (questionId) {
-      setAnswers(prev => ({
-        ...prev,
-        [questionId]: score
-      }))
-    }
+  const handleAnswerChange = (questionId, value) => {
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: parseInt(value)
+    }))
   }
 
   const handleNext = () => {
-    if (currentQuestion < totalQuestions - 1) {
-      setCurrentQuestion(prev => prev + 1)
+    if (currentQuestionIndex < totalQuestions - 1) {
+      setCurrentQuestionIndex(prev => prev + 1)
     } else {
       // 完成問卷
-      const results = currentQuestions.map(q => ({
-        questionId: q.id,
-        question: q.text,
-        answer: answers[q.id] || 1,
-        domain: q.domain,
-        aspect: q.aspect,
-        category: q.category
-      }))
-      
-      onComplete({
-        isReligious,
-        answers: results,
-        totalScore: Object.values(answers).reduce((sum, score) => sum + score, 0)
-      })
+      onComplete(answers, isReligious)
     }
   }
 
   const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(prev => prev - 1)
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1)
     }
   }
 
   const handleRestart = () => {
-    setIsReligious(null)
-    setCurrentQuestion(0)
+    setCurrentQuestionIndex(0)
     setAnswers({})
+    setIsReligious(null)
+    setShowReligiousPrompt(true)
   }
 
-  const currentAnswer = currentQuestions[currentQuestion]?.id ? 
-    answers[currentQuestions[currentQuestion].id] : null
+  const isCurrentAnswered = answers[currentQuestion?.id] !== undefined
 
-  if (isReligious === null) {
+  // 宗教信仰選擇畫面
+  if (showReligiousPrompt) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50 py-8">
-        <div className="container mx-auto px-4 max-w-2xl">
-          <Card className="bg-white border-orange-100 shadow-xl">
-            <CardHeader className="text-center pb-6">
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-500 bg-clip-text text-transparent">
-                問卷設定
-              </CardTitle>
-              <p className="text-gray-600 mt-2">
-                請選擇您的宗教信仰狀態，系統將為您提供相應的題目
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button
-                onClick={() => handleReligiousChoice(true)}
-                className="w-full h-16 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                我有宗教信仰
-              </Button>
-              
-              <Button
-                onClick={() => handleReligiousChoice(false)}
-                className="w-full h-16 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                我沒有宗教信仰
-              </Button>
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50">
+        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+          
+          {/* 返回按鈕 */}
+          <div className="mb-4 sm:mb-6">
+            <Button
+              onClick={onBack}
+              variant="outline"
+              className="px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              返回首頁
+            </Button>
+          </div>
 
-              <div className="text-center pt-4">
+          {/* 宗教信仰選擇卡片 */}
+          <Card className="border-2 border-orange-200 bg-white/80 backdrop-blur-sm shadow-xl">
+            <CardHeader className="text-center pb-4 sm:pb-6">
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2 sm:mb-4">
+                <span className="bg-gradient-to-r from-orange-600 via-red-500 to-orange-600 bg-clip-text text-transparent">
+                  開始靈性健康檢測
+                </span>
+              </CardTitle>
+              <CardDescription className="text-sm sm:text-base text-gray-600 px-2">
+                為了提供更準確的評估，請先告訴我們您的宗教信仰狀況
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-4 sm:space-y-6">
+              <div className="text-center mb-6 sm:mb-8">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-4 px-2">
+                  您是否有宗教信仰？
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-600 px-2">
+                  這將幫助我們為您提供更個人化的評估內容
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-2xl mx-auto">
                 <Button
-                  onClick={onBack}
-                  variant="outline"
-                  className="border-orange-200 text-orange-600 hover:bg-orange-50"
+                  onClick={() => handleReligiousChoice(true)}
+                  className="flex-1 px-4 sm:px-6 py-4 sm:py-6 text-sm sm:text-base font-bold bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 rounded-xl"
                 >
-                  <ChevronLeft className="w-4 h-4 mr-2" />
-                  返回首頁
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  是，我有宗教信仰
                 </Button>
+                
+                <Button
+                  onClick={() => handleReligiousChoice(false)}
+                  className="flex-1 px-4 sm:px-6 py-4 sm:py-6 text-sm sm:text-base font-bold bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 rounded-xl"
+                >
+                  <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  我沒有宗教信仰
+                </Button>
+              </div>
+
+              <div className="text-center mt-6 sm:mt-8">
+                <p className="text-xs sm:text-sm text-gray-500 px-2">
+                  無論您的選擇如何，我們都會為您提供專業的靈性健康評估
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -115,159 +144,147 @@ const Questionnaire = ({ onComplete, onBack }) => {
     )
   }
 
-  if (totalQuestions === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50 flex items-center justify-center">
-        <Card className="max-w-md bg-white border-orange-100 shadow-xl">
-          <CardContent className="p-6 text-center">
-            <p className="text-gray-600 mb-4">載入問卷題目中...</p>
-            <Button 
-              onClick={onBack}
-              variant="outline"
-              className="border-orange-200 text-orange-600 hover:bg-orange-50"
-            >
-              返回首頁
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  const question = currentQuestions[currentQuestion]
-
+  // 問卷主體
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50 py-8">
-      <div className="container mx-auto px-4 max-w-3xl">
-        {/* 頂部控制欄 */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Badge 
-              variant="outline" 
-              className={`px-3 py-1 ${
-                isReligious 
-                  ? 'border-orange-300 text-orange-700 bg-orange-50' 
-                  : 'border-teal-300 text-teal-700 bg-teal-50'
-              }`}
-            >
-              {isReligious ? '有宗教信仰' : '沒有宗教信仰'}
-            </Badge>
-            
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50">
+      <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        
+        {/* 頂部導航和進度 */}
+        <div className="mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
             <Button
               onClick={handleRestart}
               variant="outline"
-              size="sm"
-              className="border-gray-300 text-gray-600 hover:bg-gray-50"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
-              重新選擇
+              重新開始
             </Button>
+            
+            <div className="text-center sm:text-right">
+              <p className="text-xs sm:text-sm text-gray-600">
+                第 {currentQuestionIndex + 1} 題，共 {totalQuestions} 題
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                {Math.round(progress)}% 完成
+              </p>
+            </div>
           </div>
 
-          <div className="text-sm text-gray-600">
-            {currentQuestion + 1} / {totalQuestions}
-          </div>
-        </div>
-
-        {/* 進度條 */}
-        <div className="mb-8">
+          {/* 進度條 */}
           <Progress 
             value={progress} 
-            className="h-3 bg-gray-100"
+            className="w-full h-2 sm:h-3 bg-gray-200 rounded-full overflow-hidden"
           />
-          <div className="flex justify-between text-xs text-gray-500 mt-2">
-            <span>開始</span>
-            <span>{Math.round(progress)}% 完成</span>
-            <span>完成</span>
-          </div>
         </div>
 
         {/* 問題卡片 */}
-        <Card className="mb-8 bg-white border-orange-100 shadow-xl">
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3 mb-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
-                isReligious 
-                  ? 'bg-gradient-to-r from-orange-500 to-red-500' 
-                  : 'bg-gradient-to-r from-teal-500 to-cyan-500'
-              }`}>
-                {currentQuestion + 1}
-              </div>
-              <Badge variant="secondary" className="text-xs">
-                {question?.domain}
-              </Badge>
+        <Card className="border-2 border-orange-200 bg-white/80 backdrop-blur-sm shadow-xl mb-4 sm:mb-6">
+          <CardHeader className="pb-3 sm:pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+              <CardTitle className="text-base sm:text-lg font-bold text-gray-800">
+                {currentQuestion?.domain} - {currentQuestion?.aspect}
+              </CardTitle>
+              {isReligious === false && isReligiousQuestion && (
+                <span className="text-xs sm:text-sm bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                  自動跳過宗教相關題目
+                </span>
+              )}
             </div>
-            <CardTitle className="text-xl leading-relaxed text-gray-800">
-              {question?.text}
-            </CardTitle>
           </CardHeader>
-          
+
           <CardContent>
-            <div className="space-y-3">
-              <div className="text-sm text-gray-600 mb-4">
-                請選擇最符合您情況的選項：
-              </div>
+            <div className="mb-6 sm:mb-8">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 leading-relaxed mb-4 px-2">
+                {currentQuestion?.text}
+              </h3>
               
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {[1, 2, 3, 4, 5, 6].map((score) => (
-                  <Button
-                    key={score}
-                    onClick={() => handleAnswer(score)}
-                    variant={currentAnswer === score ? "default" : "outline"}
-                    className={`h-16 flex flex-col items-center justify-center transition-all duration-200 ${
-                      currentAnswer === score
-                        ? isReligious
-                          ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white border-orange-500 shadow-lg'
-                          : 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white border-teal-500 shadow-lg'
-                        : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
+              {currentQuestion?.description && (
+                <p className="text-xs sm:text-sm text-gray-600 px-2">
+                  {currentQuestion.description}
+                </p>
+              )}
+            </div>
+
+            {/* 答案選項 - 響應式布局 */}
+            <RadioGroup
+              value={answers[currentQuestion?.id]?.toString()}
+              onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}
+              className="space-y-3 sm:space-y-4"
+            >
+              {[
+                { value: 1, label: '完全不符合', color: 'bg-red-50 border-red-200 text-red-800' },
+                { value: 2, label: '大部分不符合', color: 'bg-orange-50 border-orange-200 text-orange-800' },
+                { value: 3, label: '有點不符合', color: 'bg-yellow-50 border-yellow-200 text-yellow-800' },
+                { value: 4, label: '有點符合', color: 'bg-blue-50 border-blue-200 text-blue-800' },
+                { value: 5, label: '大部分符合', color: 'bg-teal-50 border-teal-200 text-teal-800' },
+                { value: 6, label: '完全符合', color: 'bg-green-50 border-green-200 text-green-800' }
+              ].map((option) => (
+                <div key={option.value} className="flex items-center space-x-3 sm:space-x-4">
+                  <RadioGroupItem 
+                    value={option.value.toString()} 
+                    id={`option-${option.value}`}
+                    className="text-orange-600 flex-shrink-0"
+                  />
+                  <Label 
+                    htmlFor={`option-${option.value}`}
+                    className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 cursor-pointer transition-all duration-200 text-sm sm:text-base font-medium ${
+                      answers[currentQuestion?.id] === option.value 
+                        ? option.color + ' shadow-md transform scale-105' 
+                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-lg font-bold">{score}</span>
-                    <span className="text-xs">
-                      {score === 1 && '完全不符合'}
-                      {score === 2 && '不太符合'}
-                      {score === 3 && '有點不符合'}
-                      {score === 4 && '有點符合'}
-                      {score === 5 && '很符合'}
-                      {score === 6 && '完全符合'}
-                    </span>
-                  </Button>
-                ))}
-              </div>
+                    <span className="font-bold mr-2">{option.value}.</span>
+                    {option.label}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+
+            {/* 提示文字 */}
+            <div className="mt-6 sm:mt-8 text-center">
+              <p className="text-xs sm:text-sm text-gray-500 px-2">
+                請根據您的真實感受選擇最符合的選項
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* 導航按鈕 */}
-        <div className="flex justify-between items-center">
+        {/* 導航按鈕 - 響應式布局 */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Button
             onClick={handlePrevious}
-            disabled={currentQuestion === 0}
+            disabled={currentQuestionIndex === 0}
             variant="outline"
-            className="border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1"
           >
-            <ChevronLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4 mr-2" />
             上一題
           </Button>
-
+          
           <Button
             onClick={handleNext}
-            disabled={!currentAnswer}
-            className={`px-8 ${
-              isReligious
-                ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-                : 'bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600'
-            } text-white shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50`}
+            disabled={!isCurrentAnswered}
+            className="w-full sm:flex-1 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-bold bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none order-1 sm:order-2"
           >
-            {currentQuestion === totalQuestions - 1 ? '完成問卷' : '下一題'}
-            <ChevronRight className="w-4 h-4 ml-2" />
+            {currentQuestionIndex === totalQuestions - 1 ? (
+              <>
+                <CheckCircle className="w-4 h-4 mr-2" />
+                完成問卷
+              </>
+            ) : (
+              <>
+                下一題
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </>
+            )}
           </Button>
         </div>
 
         {/* 底部提示 */}
-        <div className="text-center mt-6">
-          <p className="text-xs text-gray-500">
-            題目內容會根據您的宗教信仰狀態而有所差異
+        <div className="text-center mt-4 sm:mt-6">
+          <p className="text-xs sm:text-sm text-gray-500 px-2">
+            您可以隨時返回修改之前的答案
           </p>
         </div>
       </div>
