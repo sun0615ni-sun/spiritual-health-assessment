@@ -1,0 +1,410 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 全域響應式基礎設定 */
+:root {
+  /* 顏色系統 */
+  --color-primary: #ea580c; /* orange-600 */
+  --color-primary-light: #fb923c; /* orange-400 */
+  --color-primary-dark: #c2410c; /* orange-700 */
+  --color-secondary: #0f766e; /* teal-600 */
+  --color-secondary-light: #14b8a6; /* teal-500 */
+  --color-secondary-dark: #0d9488; /* teal-600 */
+  
+  /* 字體大小變數 - 響應式調整 */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-4xl: 2.25rem; /* 36px */
+  --text-5xl: 3rem; /* 48px */
+  
+  /* 間距系統 */
+  --spacing-xs: 0.25rem; /* 4px */
+  --spacing-sm: 0.5rem; /* 8px */
+  --spacing-md: 1rem; /* 16px */
+  --spacing-lg: 1.5rem; /* 24px */
+  --spacing-xl: 2rem; /* 32px */
+  --spacing-2xl: 3rem; /* 48px */
+  
+  /* 陰影系統 */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* 手機版字體調整 */
+@media (max-width: 640px) {
+  :root {
+    --text-5xl: 2rem; /* 32px */
+    --text-4xl: 1.75rem; /* 28px */
+    --text-3xl: 1.5rem; /* 24px */
+    --text-2xl: 1.375rem; /* 22px */
+    --text-xl: 1.125rem; /* 18px */
+    --text-lg: 1rem; /* 16px */
+  }
+}
+
+/* 基礎重置和全域樣式 */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Noto Sans TC', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #374151;
+  background-color: #fefefe;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden; /* 防止水平滾動 */
+}
+
+/* 響應式容器 */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.75rem; /* 12px */
+  padding-right: 0.75rem; /* 12px */
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+    padding-left: 1rem; /* 16px */
+    padding-right: 1rem; /* 16px */
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+    padding-left: 1.5rem; /* 24px */
+    padding-right: 1.5rem; /* 24px */
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+    padding-left: 2rem; /* 32px */
+    padding-right: 2rem; /* 32px */
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+/* 響應式文字工具類 */
+.text-responsive-xs {
+  font-size: clamp(0.625rem, 2vw, 0.75rem); /* 10px - 12px */
+}
+
+.text-responsive-sm {
+  font-size: clamp(0.75rem, 2.5vw, 0.875rem); /* 12px - 14px */
+}
+
+.text-responsive-base {
+  font-size: clamp(0.875rem, 3vw, 1rem); /* 14px - 16px */
+}
+
+.text-responsive-lg {
+  font-size: clamp(1rem, 3.5vw, 1.125rem); /* 16px - 18px */
+}
+
+.text-responsive-xl {
+  font-size: clamp(1.125rem, 4vw, 1.25rem); /* 18px - 20px */
+}
+
+.text-responsive-2xl {
+  font-size: clamp(1.25rem, 5vw, 1.5rem); /* 20px - 24px */
+}
+
+.text-responsive-3xl {
+  font-size: clamp(1.5rem, 6vw, 1.875rem); /* 24px - 30px */
+}
+
+.text-responsive-4xl {
+  font-size: clamp(1.75rem, 7vw, 2.25rem); /* 28px - 36px */
+}
+
+.text-responsive-5xl {
+  font-size: clamp(2rem, 8vw, 3rem); /* 32px - 48px */
+}
+
+/* 響應式間距工具類 */
+.spacing-responsive-sm {
+  margin: clamp(0.5rem, 2vw, 1rem);
+}
+
+.spacing-responsive-md {
+  margin: clamp(1rem, 3vw, 1.5rem);
+}
+
+.spacing-responsive-lg {
+  margin: clamp(1.5rem, 4vw, 2rem);
+}
+
+/* 卡片和組件樣式 */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-xl);
+}
+
+/* 按鈕樣式增強 */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, #9a3412 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 漸層文字 */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #dc2626 50%, var(--color-primary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* 導航欄樣式 */
+.nav-backdrop {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* 響應式圖片 */
+.responsive-img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* 無障礙設計 */
+.focus-ring:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+.focus-ring:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* 高對比度模式支援 */
+@media (prefers-contrast: high) {
+  :root {
+    --color-primary: #c2410c;
+    --color-secondary: #0f766e;
+  }
+  
+  .gradient-text {
+    background: var(--color-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .card-hover {
+    border: 2px solid var(--color-primary);
+  }
+}
+
+/* 深色模式支援 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1f2937;
+    --color-text: #f9fafb;
+    --color-card: #374151;
+  }
+  
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+  
+  .nav-backdrop {
+    background-color: rgba(31, 41, 55, 0.95);
+  }
+}
+
+/* 減少動畫偏好支援 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .card-hover:hover {
+    transform: none;
+  }
+  
+  .gradient-text {
+    animation: none;
+  }
+}
+
+/* 印刷樣式 */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .card-hover {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+/* 超小螢幕優化 (< 375px) */
+@media (max-width: 374px) {
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  :root {
+    --text-5xl: 1.75rem; /* 28px */
+    --text-4xl: 1.5rem; /* 24px */
+    --text-3xl: 1.25rem; /* 20px */
+  }
+}
+
+/* 大螢幕優化 (> 1920px) */
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1600px;
+  }
+  
+  :root {
+    --text-5xl: 3.5rem; /* 56px */
+    --text-4xl: 2.75rem; /* 44px */
+    --text-3xl: 2.25rem; /* 36px */
+  }
+}
+
+/* 觸控設備優化 */
+@media (hover: none) and (pointer: coarse) {
+  .card-hover:hover {
+    transform: none;
+  }
+  
+  .btn-primary:hover {
+    transform: none;
+  }
+  
+  /* 增加觸控目標大小 */
+  button, 
+  .btn-primary,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* 橫向模式手機優化 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .container {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .nav-backdrop {
+    position: relative;
+  }
+}
+
+/* 滾動條樣式 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Firefox 滾動條 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) #f1f5f9;
+}
