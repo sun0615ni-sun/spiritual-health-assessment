@@ -162,7 +162,7 @@ const Home = ({ onStartQuestionnaire }) => {
                 <p><strong>您的權利：</strong>您有權要求查看、修正或刪除您的個人資料。如有任何疑問，請聯繫研究團隊。</p>
                 
                 <p className="text-orange-700 font-medium text-xs sm:text-sm">
-                  <strong>聯絡資訊：</strong>國立台灣大學生命教育研發育成中心 | 財團法人新北市為愛前行基金會
+                  <strong>聯絡資訊：</strong>國立台灣大學生命教育研發育成中心 | 財團法人新北市為愛前行社會福利基金會
                 </p>
               </div>
               
