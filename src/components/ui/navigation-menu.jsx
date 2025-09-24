@@ -31,7 +31,7 @@ const Navigation = ({ currentPage, onNavigate, totalResponses = 0 }) => {
             <div className="flex items-center gap-1 sm:gap-2">
               <img 
                 src="/spiritual-health-assessment/afl-logo.png" 
-                alt="財團法人新北市為愛前行基金會" 
+                alt="財團法人新北市為愛前行社會福利基金會" 
                 className="h-6 sm:h-8 md:h-10 w-auto object-contain"
                 onError={(e) => {
                   console.log('AFL logo failed to load');
@@ -59,7 +59,7 @@ const Navigation = ({ currentPage, onNavigate, totalResponses = 0 }) => {
               靈性健康檢測系統
             </h1>
             <div className="text-xs text-gray-500 mt-0.5 sm:mt-1 hidden sm:block">
-              <div className="truncate">財團法人新北市為愛前行基金會</div>
+              <div className="truncate">財團法人新北市為愛前行社會福利基金會</div>
               <div className="truncate">國立台灣大學生命教育研發育成中心</div>
             </div>
           </div>
