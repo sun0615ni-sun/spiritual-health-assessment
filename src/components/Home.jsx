@@ -77,7 +77,7 @@ const Home = ({ onStartAssessment }) => {
         <div className="text-center mb-8 sm:mb-12">
           <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6">
             <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-            權威者：權威研發
+            編制者：孫效智教授
           </div>
           
           <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold bg-gradient-to-r from-orange-600 via-red-500 to-orange-700 bg-clip-text text-transparent mb-4 sm:mb-6 leading-tight">
