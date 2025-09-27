@@ -1,76 +1,59 @@
-# GitHub Actions 工作流程：部署到 GitHub Pages
 name: Deploy to GitHub Pages
 
-# 觸發條件：當推送到 main 分支或對 main 分支發起 PR 時執行
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 
-# 權限設定：GitHub Pages 部署所需的權限
 permissions:
-  contents: read      # 讀取倉庫內容
-  pages: write        # 寫入 GitHub Pages
-  id-token: write     # 寫入 ID token（用於身份驗證）
+  contents: read
+  pages: write
+  id-token: write
 
-# 並發控制：確保同時只有一個部署任務運行
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # 建置任務
   build:
     runs-on: ubuntu-latest
     steps:
-      # 步驟 1：檢出代碼
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 步驟 2：設置 pnpm（Node.js 包管理器）
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9  # 使用 pnpm 版本 9
+          version: 9
 
-      # 步驟 3：設置 Node.js 環境
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'    # 使用 Node.js 20
-          cache: 'pnpm'         # 啟用 pnpm 快取
+          node-version: '20'
+          cache: 'pnpm'
 
-      # 步驟 4：安裝依賴
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile  # 使用鎖定檔案確保依賴版本一致
+        run: pnpm install --frozen-lockfile
 
-      # 步驟 5：建置專案
       - name: Build
         run: pnpm run build
 
-      # 步驟 6：設置 GitHub Pages
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      # 步驟 7：上傳建置結果作為 artifact
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'  # 上傳 dist 目錄（Vite 的預設輸出目錄）
+          path: './dist'
 
-  # 部署任務
   deploy:
-    # 部署環境設定
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
     runs-on: ubuntu-latest
-    needs: build  # 依賴於 build 任務完成
-    
+    needs: build
     steps:
-      # 步驟：部署到 GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
