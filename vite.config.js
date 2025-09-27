@@ -1,37 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  // *** 最重要：設定 GitHub Pages 的 base 為 repo 名稱（注意前後斜線） ***
   base: '/spiritual-health-assessment/',
+  plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, 'src'),
     },
   },
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          ui: ['lucide-react'],
-          charts: ['recharts']
-        }
-      }
-    }
-  },
-  server: {
-    port: 5173,
-    host: '0.0.0.0'
-  },
-  preview: {
-    port: 4173,
-    host: '0.0.0.0',
-    allowedHosts: ['all']
-  }
-})
+});
