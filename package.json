@@ -11,13 +11,6 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    /* 保留你原本的 dependencies（此處省略） */
-  },
-  "devDependencies": {
-    /* 保留你原本的 devDependencies（此處省略） */
-  }
-}
-  "dependencies": {
     "@radix-ui/react-accordion": "^1.2.1",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
