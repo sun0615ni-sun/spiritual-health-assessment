@@ -1,14 +1,22 @@
 {
   "name": "spiritual-health-assessment",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "homepage": "https://sun0615ni-sun.github.io/spiritual-health-assessment/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "format": "prettier --write ."
   },
+  "dependencies": {
+    /* 保留你原本的 dependencies（此處省略） */
+  },
+  "devDependencies": {
+    /* 保留你原本的 devDependencies（此處省略） */
+  }
+}
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.1",
     "@radix-ui/react-alert-dialog": "^1.1.2",
