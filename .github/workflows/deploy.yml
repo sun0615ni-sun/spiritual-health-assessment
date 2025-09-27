@@ -1,15 +1,38 @@
-# 切到 repo
-cd /path/to/spiritual-health-assessment   # 改成你本機路徑，或在 Trae terminal 已在 repo 根目錄就不用改
+name: Deploy to GitHub Pages
 
-# 從 main 建新的測試 branch
-git checkout main
-git pull origin main
-git checkout -b fix/deploy-workflow
+on:
+  push:
+    branches:
+      - main
 
-# 建目錄（若已存在會跳過）
-mkdir -p .github/workflows
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
-# 用你的編輯器把畫布內容貼進這個檔案
-# (如果你在終端會用 echo >> 但建議用編輯器貼上，下面示範用 nano)
-nano .github/workflows/deploy.yml
-# (在 nano 裡貼上畫布內容 → Ctrl+O 存檔 → Enter → Ctrl+X 離開)
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install gh-pages --save-dev
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        run: npm run deploy
