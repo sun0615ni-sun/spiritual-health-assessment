@@ -19,7 +19,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          ui: ['lucide-react', 'recharts'],
+          ui: ['lucide-react'],
           charts: ['recharts']
         }
       }
@@ -27,10 +27,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    host: true
+    host: '0.0.0.0'
   },
   preview: {
     port: 4173,
-    host: true
+    host: '0.0.0.0',
+    allowedHosts: ['all']
   }
 })
