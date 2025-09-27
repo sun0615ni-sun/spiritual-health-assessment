@@ -1,10 +1,12 @@
+// 靈性健康評估問卷的領域定義
 export const domains = {
   self: "與自己的關係",
-  others: "與他人的關係",
+  others: "與他人的關係", 
   nature: "與自然的關係",
   transcendent: "與超越者的關係",
 };
 
+// 靈性健康評估的各個面向定義
 export const aspects = {
   self_awareness: "自我覺察",
   meaning_in_life: "生命意義",
@@ -14,6 +16,15 @@ export const aspects = {
   humility_awe: "謙卑與敬畏",
   hope_faith: "盼望與信心",
 };
+
+// 評分選項：用於問卷答題的選項
+export const scoreOptions = [
+  { value: 1, label: "完全不同意" },
+  { value: 2, label: "不同意" },
+  { value: 3, label: "普通" },
+  { value: 4, label: "同意" },
+  { value: 5, label: "完全同意" }
+];
 
 // 題目會根據宗教信仰狀態顯示不同版本
 // 每個題目都有專屬的領域(domain)和面向(aspect)分類，用於結果頁評分
