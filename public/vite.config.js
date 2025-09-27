@@ -3,6 +3,14 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 export default defineConfig({
+  base: '/spiritual-health-assessment/',
+  build: {
+    outDir: 'dist'
+  }
+})
+
+
+export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
